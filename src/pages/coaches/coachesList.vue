@@ -12,7 +12,13 @@
           <base-button mode="outline" @click="loadCoaches(true)"
             >Refresh</base-button
           >
-          <base-button link to="/register" v-if="!isCoach && !isLoading"
+          <base-button link to="/auth?redirect=register" v-if="!isLoggedIn"
+            >Login to Register as Coach</base-button
+          >
+          <base-button
+            link
+            to="/register"
+            v-if="isLoggedIn && !isCoach && !isLoading"
             >Register as Coach</base-button
           >
         </div>
@@ -38,10 +44,14 @@
 </template>
 
 <script>
-import CoachFilter from '../../components/coaches/coachFilter.vue';
+import coachFilter from '../../components/coaches/coachFilter.vue';
 import coachItem from '../../components/coaches/coachItem.vue';
+
 export default {
-  components: { coachItem, CoachFilter },
+  components: {
+    coachItem,
+    coachFilter,
+  },
   data() {
     return {
       isLoading: false,
@@ -54,6 +64,13 @@ export default {
     };
   },
   computed: {
+    isLoggedIn() {
+      return this.$store.getters.isAuthenticated;
+    },
+
+    isCoach() {
+      return this.$store.getters['coaches/isCoach'];
+    },
     filteredCoaches() {
       const coaches = this.$store.getters['coaches/coaches'];
       return coaches.filter((coach) => {
@@ -72,10 +89,6 @@ export default {
     hasCoaches() {
       return !this.isLoading && this.$store.getters['coaches/hasCoaches'];
     },
-
-    isCoach() {
-      return this.$store.getters['coaches/isCoach'];
-    },
   },
   created() {
     this.loadCoaches();
@@ -91,7 +104,7 @@ export default {
           forceRefresh: refresh,
         });
       } catch (error) {
-        this.error = error.message || 'Something went wrong';
+        this.error = error.message || 'Something went wrong!';
       }
       this.isLoading = false;
     },

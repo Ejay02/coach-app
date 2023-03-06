@@ -10,8 +10,11 @@ export default {
       areas: data.areas,
     };
 
+    const token = ctx.rootGetters.token;
+
     const res = await fetch(
-      `https://coach-app-db-default-rtdb.firebaseio.com/${userId}.json`,
+      `https://coach-app-db-default-rtdb.firebaseio.com/${userId}.json?auth=` +
+        token,
       {
         method: 'PUT',
         body: JSON.stringify(coachData),
@@ -57,6 +60,7 @@ export default {
       coaches.push(coach);
     }
     ctx.commit('setCoaches', coaches);
-    ctx.commit('setFetchTimestamp');
+    ctx.commit('setFetchTimestamp', null, { root: true });
+    // ctx.commit('setFetchTimestamp');
   },
 };
